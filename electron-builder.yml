@@ -12,6 +12,8 @@ win:
       arch:
         - x64
   icon: build/icon.png
+  signAndEditExecutable: false
+  signingHashAlgorithms: null
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
