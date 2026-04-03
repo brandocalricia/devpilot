@@ -121,6 +121,8 @@ export default function App() {
   return (
     <ThemeProvider settings={settings} onSaveSettings={updateSettings}>
       <div className="flex h-screen" style={{ background: 'rgb(var(--bg-rgb))', color: 'rgb(var(--text-rgb))' }}>
+        {/* Drag region for moving the window */}
+        <div className="drag-region fixed top-0 left-0 right-0 h-9 z-50" />
         <Sidebar active={page} onNavigate={(p) => { setPage(p); setSelectedProject(null) }} />
         <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'rgb(var(--bg-rgb))' }}>
           <UpdateBanner />

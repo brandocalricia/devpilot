@@ -107,6 +107,7 @@ function createWindow() {
       symbolColor: getSavedTheme() === 'light' ? '#6b6b6b' : '#888780',
       height: 36,
     },
+    icon: path.join(__dirname, '..', 'build', 'icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,

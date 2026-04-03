@@ -39,3 +39,11 @@ select option {
   background: rgb(var(--bg-card-rgb));
   color: rgb(var(--text-rgb));
 }
+
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.drag-region button, .drag-region a, .drag-region input, .drag-region select {
+  -webkit-app-region: no-drag;
+}
