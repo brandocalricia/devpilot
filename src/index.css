@@ -2,28 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --accent-rgb: 93 202 165;
-  --bg-rgb: 15 15 16;
-  --bg-card-rgb: 24 24 27;
-  --bg-sidebar-rgb: 19 19 22;
-  --bg-hover-rgb: 31 31 35;
-  --bg-briefing-rgb: 21 21 37;
-  --text-rgb: 255 255 255;
-  --text-muted-rgb: 136 135 128;
-  --border-val: rgba(255, 255, 255, 0.06);
-}
-
-.light {
-  --bg-rgb: 248 248 250;
-  --bg-card-rgb: 255 255 255;
-  --bg-sidebar-rgb: 240 240 243;
-  --bg-hover-rgb: 232 232 236;
-  --bg-briefing-rgb: 238 240 255;
-  --text-rgb: 26 26 26;
-  --text-muted-rgb: 107 107 107;
-  --border-val: rgba(0, 0, 0, 0.08);
-}
+/* Theme variables are set by ThemeContext.jsx on document.documentElement */
 
 * {
   margin: 0;
@@ -31,12 +10,12 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  background: rgb(var(--bg-rgb));
-  color: rgb(var(--text-rgb));
+  background: rgb(var(--bg-rgb)) !important;
+  color: rgb(var(--text-rgb)) !important;
 }
 
 ::-webkit-scrollbar {
@@ -56,7 +35,7 @@ body {
   background: rgba(128, 128, 128, 0.35);
 }
 
-.light select option {
-  background: #ffffff;
-  color: #1a1a1a;
+select option {
+  background: rgb(var(--bg-card-rgb));
+  color: rgb(var(--text-rgb));
 }

@@ -28,6 +28,7 @@ if (!window.devpilot) {
     onUpdateAvailable: () => {},
     onUpdateDownloaded: () => {},
     onUpdateProgress: () => {},
+    setThemeColors: async () => {},
   }
 }
 

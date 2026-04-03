@@ -14,6 +14,9 @@ contextBridge.exposeInMainWorld('devpilot', {
   getCache: () => ipcRenderer.invoke('get-cache'),
   saveCache: (data) => ipcRenderer.invoke('save-cache', data),
 
+  // Theme
+  setThemeColors: (bgColor) => ipcRenderer.invoke('set-theme-colors', bgColor),
+
   // Health
   checkHealth: (url) => ipcRenderer.invoke('check-health', url),
 

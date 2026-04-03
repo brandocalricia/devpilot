@@ -1,7 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0)
+
+  // Onboarding renders outside ThemeProvider, so set CSS variables directly
+  useEffect(() => {
+    const root = document.documentElement
+    const body = document.body
+    const vars = {
+      '--bg-rgb': '15 15 16',
+      '--bg-card-rgb': '24 24 27',
+      '--bg-hover-rgb': '31 31 35',
+      '--text-rgb': '255 255 255',
+      '--text-muted-rgb': '136 135 128',
+      '--accent-rgb': '93 202 165',
+      '--border-val': 'rgba(255, 255, 255, 0.06)',
+    }
+    for (const [key, value] of Object.entries(vars)) {
+      root.style.setProperty(key, value)
+      body.style.setProperty(key, value)
+    }
+    root.style.backgroundColor = 'rgb(15, 15, 16)'
+    root.style.color = 'rgb(255, 255, 255)'
+    body.style.backgroundColor = 'rgb(15, 15, 16)'
+    body.style.color = 'rgb(255, 255, 255)'
+  }, [])
   const [projectsPath, setProjectsPath] = useState('C:\\Users\\bzcni\\OneDrive\\Desktop\\vs code projects')
   const [licenseKey, setLicenseKey] = useState('')
   const [validating, setValidating] = useState(false)

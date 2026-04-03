@@ -85,6 +85,13 @@ function saveWindowBounds() {
   fs.writeFileSync(boundsPath, JSON.stringify(mainWindow.getBounds()))
 }
 
+function getSavedTheme() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(getSettingsPath(), 'utf-8'))
+    return raw.theme || 'dark'
+  } catch { return 'dark' }
+}
+
 // --- Window creation ---
 
 function createWindow() {
@@ -93,11 +100,11 @@ function createWindow() {
     ...bounds,
     minWidth: 900,
     minHeight: 600,
-    backgroundColor: '#0f0f10',
+    backgroundColor: getSavedTheme() === 'light' ? '#f8f8fa' : '#0f0f10',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#0f0f10',
-      symbolColor: '#888780',
+      color: getSavedTheme() === 'light' ? '#f0f0f3' : '#0f0f10',
+      symbolColor: getSavedTheme() === 'light' ? '#6b6b6b' : '#888780',
       height: 36,
     },
     webPreferences: {
@@ -186,6 +193,18 @@ ipcMain.handle('open-in-vscode', async (_, filePath, line) => {
     execSync(line ? `code --goto "${filePath}:${line}"` : `code "${filePath}"`)
     return true
   } catch { return false }
+})
+
+// --- IPC: Theme color sync ---
+ipcMain.handle('set-theme-colors', async (_, bgColor) => {
+  if (mainWindow) {
+    mainWindow.setBackgroundColor(bgColor)
+    const isLight = bgColor !== 'rgb(15, 15, 16)'
+    mainWindow.setTitleBarOverlay({
+      color: isLight ? '#f0f0f3' : '#0f0f10',
+      symbolColor: isLight ? '#6b6b6b' : '#888780',
+    })
+  }
 })
 
 // --- IPC: Settings (encrypted) ---

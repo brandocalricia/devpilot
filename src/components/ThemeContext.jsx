@@ -13,7 +13,59 @@ const ACCENT_PRESETS = [
   { name: 'Cyan', value: '#22D3EE' },
 ]
 
+const DARK_VARS = {
+  '--bg-rgb': '15 15 16',
+  '--bg-card-rgb': '24 24 27',
+  '--bg-sidebar-rgb': '19 19 22',
+  '--bg-hover-rgb': '31 31 35',
+  '--bg-briefing-rgb': '21 21 37',
+  '--text-rgb': '255 255 255',
+  '--text-muted-rgb': '136 135 128',
+  '--border-val': 'rgba(255, 255, 255, 0.06)',
+}
+
+const LIGHT_VARS = {
+  '--bg-rgb': '248 248 250',
+  '--bg-card-rgb': '255 255 255',
+  '--bg-sidebar-rgb': '240 240 243',
+  '--bg-hover-rgb': '232 232 236',
+  '--bg-briefing-rgb': '238 240 255',
+  '--text-rgb': '26 26 26',
+  '--text-muted-rgb': '107 107 107',
+  '--border-val': 'rgba(0, 0, 0, 0.08)',
+}
+
 export { ACCENT_PRESETS }
+
+function applyTheme(theme, accent) {
+  const vars = theme === 'light' ? LIGHT_VARS : DARK_VARS
+  const root = document.documentElement
+  const body = document.body
+
+  for (const [key, value] of Object.entries(vars)) {
+    root.style.setProperty(key, value)
+    body.style.setProperty(key, value)
+  }
+
+  const rgb = hexToRgb(accent)
+  root.style.setProperty('--accent-rgb', rgb)
+  body.style.setProperty('--accent-rgb', rgb)
+
+  // Force background and color on BOTH html and body to override Electron's native bg
+  const bgRgb = vars['--bg-rgb']
+  const textRgb = vars['--text-rgb']
+  const bgColor = `rgb(${bgRgb.split(' ').join(', ')})`
+  const textColor = `rgb(${textRgb.split(' ').join(', ')})`
+  root.style.backgroundColor = bgColor
+  root.style.color = textColor
+  body.style.backgroundColor = bgColor
+  body.style.color = textColor
+
+  // Tell Electron to update its native background color
+  if (window.devpilot?.setThemeColors) {
+    window.devpilot.setThemeColors(bgColor)
+  }
+}
 
 export function ThemeProvider({ children, settings, onSaveSettings }) {
   const [theme, setTheme] = useState(settings?.theme || 'dark')
@@ -25,24 +77,19 @@ export function ThemeProvider({ children, settings, onSaveSettings }) {
   }, [settings?.theme, settings?.accentColor])
 
   useEffect(() => {
-    const root = document.documentElement
-    if (theme === 'light') {
-      root.classList.add('light')
-    } else {
-      root.classList.remove('light')
-    }
-    root.style.setProperty('--accent', accent)
-    root.style.setProperty('--accent-rgb', hexToRgb(accent))
+    applyTheme(theme, accent)
   }, [theme, accent])
 
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark'
     setTheme(next)
+    applyTheme(next, accent)
     if (onSaveSettings) onSaveSettings({ ...settings, theme: next })
   }
 
   function setAccentColor(color) {
     setAccent(color)
+    applyTheme(theme, color)
     if (onSaveSettings) onSaveSettings({ ...settings, accentColor: color })
   }
 

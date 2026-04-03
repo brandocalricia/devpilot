@@ -3,7 +3,7 @@ import { useTheme } from './ThemeContext'
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '⌘' },
   { id: 'projects', label: 'Projects', icon: '◫' },
-  { id: 'todos', label: 'TODOs', icon: '☑' },
+  { id: 'todos', label: 'Action Items', icon: '☑' },
   { id: 'chat', label: 'Chat', icon: '◉' },
   { id: 'settings', label: 'Settings', icon: '⚙' },
 ]

@@ -4,17 +4,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: 'rgb(var(--bg-rgb) / <alpha-value>)',
-        'bg-card': 'rgb(var(--bg-card-rgb) / <alpha-value>)',
-        'bg-sidebar': 'rgb(var(--bg-sidebar-rgb) / <alpha-value>)',
-        'bg-hover': 'rgb(var(--bg-hover-rgb) / <alpha-value>)',
-        'bg-briefing': 'rgb(var(--bg-briefing-rgb) / <alpha-value>)',
+        bg: 'rgb(var(--bg-rgb))',
+        'bg-card': 'rgb(var(--bg-card-rgb))',
+        'bg-sidebar': 'rgb(var(--bg-sidebar-rgb))',
+        'bg-hover': 'rgb(var(--bg-hover-rgb))',
+        'bg-briefing': 'rgb(var(--bg-briefing-rgb))',
         border: 'var(--border-val)',
-        accent: 'rgb(var(--accent-rgb) / <alpha-value>)',
-        active: 'rgb(var(--accent-rgb) / <alpha-value>)',
+        accent: 'rgb(var(--accent-rgb))',
+        active: 'rgb(var(--accent-rgb))',
         paused: '#EF9F27',
         stale: '#E24B4A',
-        muted: 'rgb(var(--text-muted-rgb) / <alpha-value>)',
+        muted: 'rgb(var(--text-muted-rgb))',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
