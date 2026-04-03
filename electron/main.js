@@ -15,8 +15,8 @@ const APP_VERSION = require('../package.json').version
 const SENSITIVE_KEYS = ['licenseKey']
 
 // --- Server config ---
-const API_BASE = 'https://devpilot-proxy-production.up.railway.app' // TODO: update after deploy
-const APP_SECRET = 'dplt_s3cr3t_k3y_2024_pr0d' // TODO: generate a real secret and match server env
+const API_BASE = 'https://devpilot-brando.up.railway.app'
+const APP_SECRET = '07c362b9f48e04e1063dd482a4c9c52ded10836f6f86256d74a95b7ea790e083'
 
 // --- Device fingerprint ---
 function getDeviceId() {
