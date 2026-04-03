@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #5DCAA5;
+  --accent-rgb: 93, 202, 165;
+  --bg: #0f0f10;
+  --bg-card: #18181b;
+  --bg-sidebar: #131316;
+  --bg-hover: #1f1f23;
+  --bg-briefing: #151525;
+  --text: #ffffff;
+  --text-muted: #888780;
+  --border: rgba(255, 255, 255, 0.06);
+}
+
+.light {
+  --bg: #f8f8fa;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f0f0f3;
+  --bg-hover: #e8e8ec;
+  --bg-briefing: #eef0ff;
+  --text: #1a1a1a;
+  --text-muted: #6b6b6b;
+  --border: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.35);
+}
+
+/* Light mode select/option styling */
+.light select option {
+  background: #ffffff;
+  color: #1a1a1a;
+}
