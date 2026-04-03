@@ -4,17 +4,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: 'var(--bg)',
-        'bg-card': 'var(--bg-card)',
-        'bg-sidebar': 'var(--bg-sidebar)',
-        'bg-hover': 'var(--bg-hover)',
-        'bg-briefing': 'var(--bg-briefing)',
-        border: 'var(--border)',
-        accent: 'var(--accent)',
-        active: 'var(--accent)',
+        bg: 'rgb(var(--bg-rgb) / <alpha-value>)',
+        'bg-card': 'rgb(var(--bg-card-rgb) / <alpha-value>)',
+        'bg-sidebar': 'rgb(var(--bg-sidebar-rgb) / <alpha-value>)',
+        'bg-hover': 'rgb(var(--bg-hover-rgb) / <alpha-value>)',
+        'bg-briefing': 'rgb(var(--bg-briefing-rgb) / <alpha-value>)',
+        border: 'var(--border-val)',
+        accent: 'rgb(var(--accent-rgb) / <alpha-value>)',
+        active: 'rgb(var(--accent-rgb) / <alpha-value>)',
         paused: '#EF9F27',
         stale: '#E24B4A',
-        muted: 'var(--text-muted)',
+        muted: 'rgb(var(--text-muted-rgb) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

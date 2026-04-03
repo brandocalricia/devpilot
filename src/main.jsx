@@ -11,7 +11,6 @@ if (!window.devpilot) {
     openInVSCode: async () => true,
     getSettings: async () => null,
     saveSettings: async () => true,
-    saveApiKey: async () => true,
     saveLicenseKey: async () => true,
     getCache: async () => ({}),
     saveCache: async () => true,

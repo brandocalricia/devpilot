@@ -25,7 +25,7 @@ export default function ProjectCard({ project, onClick, onToggleArchive }) {
 
   return (
     <div className="bg-bg-card rounded-lg p-4 text-left hover:bg-bg-hover transition-all group relative"
-      style={{ border: '1px solid var(--border)' }}>
+      style={{ border: '1px solid var(--border-val)' }}>
       <button onClick={onClick} className="w-full text-left">
         <div className="flex items-start justify-between mb-2">
           <h3 className={`text-sm font-medium truncate mr-2 transition-colors ${isArchived ? 'text-muted' : 'group-hover:text-accent'}`}>
@@ -39,7 +39,7 @@ export default function ProjectCard({ project, onClick, onToggleArchive }) {
         <p className="text-xs text-muted truncate mb-3">{project.lastCommitMessage}</p>
         <div className="flex gap-1.5 mb-3 flex-wrap">
           {project.languages.slice(0, 3).map(l => (
-            <span key={l.lang} className="text-xs px-1.5 py-0.5 rounded text-muted" style={{ background: 'var(--border)' }}>
+            <span key={l.lang} className="text-xs px-1.5 py-0.5 rounded text-muted" style={{ background: 'var(--border-val)' }}>
               {l.lang} {l.pct}%
             </span>
           ))}
@@ -52,11 +52,11 @@ export default function ProjectCard({ project, onClick, onToggleArchive }) {
           </div>
         </div>
         {!isArchived && (
-          <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+          <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'var(--border-val)' }}>
             <div className="h-full rounded-full transition-all"
               style={{
                 width: `${Math.max(5, healthScore)}%`,
-                backgroundColor: healthScore > 60 ? 'var(--accent)' : healthScore > 30 ? '#EF9F27' : '#E24B4A',
+                backgroundColor: healthScore > 60 ? 'rgb(var(--accent-rgb))' : healthScore > 30 ? '#EF9F27' : '#E24B4A',
               }} />
           </div>
         )}

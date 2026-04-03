@@ -3,27 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --accent: #5DCAA5;
-  --accent-rgb: 93, 202, 165;
-  --bg: #0f0f10;
-  --bg-card: #18181b;
-  --bg-sidebar: #131316;
-  --bg-hover: #1f1f23;
-  --bg-briefing: #151525;
-  --text: #ffffff;
-  --text-muted: #888780;
-  --border: rgba(255, 255, 255, 0.06);
+  --accent-rgb: 93 202 165;
+  --bg-rgb: 15 15 16;
+  --bg-card-rgb: 24 24 27;
+  --bg-sidebar-rgb: 19 19 22;
+  --bg-hover-rgb: 31 31 35;
+  --bg-briefing-rgb: 21 21 37;
+  --text-rgb: 255 255 255;
+  --text-muted-rgb: 136 135 128;
+  --border-val: rgba(255, 255, 255, 0.06);
 }
 
 .light {
-  --bg: #f8f8fa;
-  --bg-card: #ffffff;
-  --bg-sidebar: #f0f0f3;
-  --bg-hover: #e8e8ec;
-  --bg-briefing: #eef0ff;
-  --text: #1a1a1a;
-  --text-muted: #6b6b6b;
-  --border: rgba(0, 0, 0, 0.08);
+  --bg-rgb: 248 248 250;
+  --bg-card-rgb: 255 255 255;
+  --bg-sidebar-rgb: 240 240 243;
+  --bg-hover-rgb: 232 232 236;
+  --bg-briefing-rgb: 238 240 255;
+  --text-rgb: 26 26 26;
+  --text-muted-rgb: 107 107 107;
+  --border-val: rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -36,8 +35,8 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
+  background: rgb(var(--bg-rgb));
+  color: rgb(var(--text-rgb));
 }
 
 ::-webkit-scrollbar {
@@ -57,7 +56,6 @@ body {
   background: rgba(128, 128, 128, 0.35);
 }
 
-/* Light mode select/option styling */
 .light select option {
   background: #ffffff;
   color: #1a1a1a;

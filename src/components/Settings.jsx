@@ -7,8 +7,6 @@ export default function Settings({ settings, onSave }) {
   const [licenseInput, setLicenseInput] = useState('')
   const [licenseStatus, setLicenseStatus] = useState(null)
   const [validating, setValidating] = useState(false)
-  const [apiKeyInput, setApiKeyInput] = useState('')
-  const [apiKeySaved, setApiKeySaved] = useState(false)
   const [aiUsage, setAiUsage] = useState(null)
   const { theme, accent, toggleTheme, setAccentColor } = useTheme()
 
@@ -24,17 +22,6 @@ export default function Settings({ settings, onSave }) {
     onSave(next)
   }
 
-  async function saveApiKey() {
-    if (!apiKeyInput.trim()) return
-    await window.devpilot.saveApiKey(apiKeyInput.trim())
-    setApiKeyInput('')
-    setApiKeySaved(true)
-    setTimeout(() => setApiKeySaved(false), 2000)
-    // Refresh settings to get updated _hasApiKey
-    const s = await window.devpilot.getSettings()
-    if (s) setForm(s)
-  }
-
   async function activateLicense() {
     if (!licenseInput.trim()) return
     setValidating(true)
@@ -46,6 +33,8 @@ export default function Settings({ settings, onSave }) {
         setLicenseInput('')
         const s = await window.devpilot.getSettings()
         if (s) { setForm(s); onSave(s) }
+        // Refresh usage to show pro limits
+        if (window.devpilot.aiUsageStatus) window.devpilot.aiUsageStatus().then(setAiUsage)
       } else {
         setLicenseStatus({ ok: false, msg: result.error || 'Invalid license key' })
       }
@@ -60,6 +49,7 @@ export default function Settings({ settings, onSave }) {
     const s = await window.devpilot.getSettings()
     if (s) { setForm(s); onSave(s) }
     setLicenseStatus(null)
+    if (window.devpilot.aiUsageStatus) window.devpilot.aiUsageStatus().then(setAiUsage)
   }
 
   const isPro = !!form._hasLicenseKey
@@ -73,11 +63,11 @@ export default function Settings({ settings, onSave }) {
 
       <div className="space-y-5">
         {/* License */}
-        <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border)' }}>
+        <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border-val)' }}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium">License</h3>
             <span className={`text-xs px-2 py-0.5 rounded-full ${isPro ? 'text-accent' : 'text-muted'}`}
-              style={isPro ? { background: 'rgba(var(--accent-rgb), 0.2)' } : { background: 'var(--border)' }}>
+              style={isPro ? { background: 'rgb(var(--accent-rgb) / 0.2)' } : { background: 'var(--border-val)' }}>
               {isPro ? (form.licensePlan || 'Pro') : 'Free'}
             </span>
           </div>
@@ -96,7 +86,7 @@ export default function Settings({ settings, onSave }) {
                   onKeyDown={e => { if (e.key === 'Enter') activateLicense() }}
                   placeholder="DPLT-XXXX-XXXX-XXXX"
                   className="flex-1 bg-bg rounded-md px-3 py-2 text-sm font-mono focus:outline-none"
-                  style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+                  style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
                 />
                 <button
                   onClick={activateLicense}
@@ -116,10 +106,10 @@ export default function Settings({ settings, onSave }) {
 
         {/* AI Usage */}
         {aiUsage && (
-          <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border)' }}>
+          <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border-val)' }}>
             <h3 className="text-sm font-medium mb-2">AI Usage Today</h3>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border-val)' }}>
                 <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(aiUsage.used / aiUsage.limit) * 100}%` }} />
               </div>
               <span className="text-xs text-muted">{aiUsage.used}/{aiUsage.limit}</span>
@@ -128,14 +118,14 @@ export default function Settings({ settings, onSave }) {
         )}
 
         {/* Appearance */}
-        <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border)' }}>
+        <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border-val)' }}>
           <h3 className="text-sm font-medium mb-3">Appearance</h3>
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs text-muted">Theme</span>
             <button
               onClick={toggleTheme}
               className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-md transition-colors"
-              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+              style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
             >
               {theme === 'dark' ? '☀ Light' : '☾ Dark'}
             </button>
@@ -156,7 +146,7 @@ export default function Settings({ settings, onSave }) {
                   title={p.name}
                 />
               ))}
-              <label className="w-7 h-7 rounded-full cursor-pointer overflow-hidden relative" style={{ border: '2px dashed var(--border)' }}>
+              <label className="w-7 h-7 rounded-full cursor-pointer overflow-hidden relative" style={{ border: '2px dashed var(--border-val)' }}>
                 <input
                   type="color"
                   value={accent}
@@ -175,31 +165,8 @@ export default function Settings({ settings, onSave }) {
             value={form.projectsPath || ''}
             onChange={e => update('projectsPath', e.target.value)}
             className="w-full bg-bg-card rounded-md px-3 py-2 text-sm focus:outline-none"
-            style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
           />
-        </Field>
-
-        {/* API Key — secure input, never displays stored key */}
-        <Field label="Claude API Key">
-          <div className="flex gap-2">
-            <input
-              type="password"
-              value={apiKeyInput}
-              onChange={e => setApiKeyInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') saveApiKey() }}
-              placeholder={form._hasApiKey ? 'Key saved ✓ (enter new to replace)' : 'sk-ant-...'}
-              className="flex-1 bg-bg-card rounded-md px-3 py-2 text-sm focus:outline-none"
-              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
-            />
-            <button
-              onClick={saveApiKey}
-              disabled={!apiKeyInput.trim()}
-              className="px-4 py-2 bg-accent text-white rounded-md text-xs font-medium hover:opacity-90 transition-colors disabled:opacity-50"
-            >
-              {apiKeySaved ? '✓' : 'Save'}
-            </button>
-          </div>
-          <p className="text-xs text-muted/40 mt-1">Your key is encrypted and stored locally. It never leaves this device.</p>
         </Field>
 
         <Field label="Scan Frequency">
@@ -207,7 +174,7 @@ export default function Settings({ settings, onSave }) {
             value={form.scanFrequency || 'on-open'}
             onChange={e => update('scanFrequency', e.target.value)}
             className="bg-bg-card rounded-md px-3 py-2 text-sm"
-            style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
           >
             <option value="on-open">On app open</option>
             <option value="hourly">Every hour</option>
@@ -221,7 +188,7 @@ export default function Settings({ settings, onSave }) {
             value={form.railwayUrl || ''}
             onChange={e => update('railwayUrl', e.target.value)}
             className="w-full bg-bg-card rounded-md px-3 py-2 text-sm focus:outline-none"
-            style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
           />
         </Field>
 
@@ -231,7 +198,7 @@ export default function Settings({ settings, onSave }) {
             value={form.mrr || 0}
             onChange={e => update('mrr', Number(e.target.value))}
             className="w-40 bg-bg-card rounded-md px-3 py-2 text-sm focus:outline-none"
-            style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+            style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
           />
         </Field>
 
@@ -241,7 +208,7 @@ export default function Settings({ settings, onSave }) {
             value={(form.excludedFolders || []).join(', ')}
             onChange={e => update('excludedFolders', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
             className="w-full bg-bg-card rounded-md px-3 py-2 text-sm text-muted focus:outline-none"
-            style={{ border: '1px solid var(--border)' }}
+            style={{ border: '1px solid var(--border-val)' }}
           />
           <p className="text-xs text-muted/50 mt-1">Comma-separated list</p>
         </Field>

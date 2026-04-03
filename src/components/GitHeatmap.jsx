@@ -21,20 +21,20 @@ export default function GitHeatmap({ data }) {
   }
 
   return (
-    <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border)' }}>
+    <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border-val)' }}>
       <div className="flex gap-1 flex-wrap">
         {days.map(d => (
           <div
             key={d.date}
             className="w-[18px] h-[18px] rounded-sm transition-colors"
             style={{
-              backgroundColor: d.count === 0 ? 'var(--border)' : `rgba(var(--accent-rgb), ${getOpacity(d.count)})`,
+              backgroundColor: d.count === 0 ? 'var(--border-val)' : `rgb(var(--accent-rgb) / ${getOpacity(d.count)})`,
             }}
             title={`${d.date}: ${d.count} commit${d.count !== 1 ? 's' : ''}`}
           />
         ))}
       </div>
-      <div className="flex justify-between mt-2 text-xs" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+      <div className="flex justify-between mt-2 text-xs" style={{ color: 'rgb(var(--text-muted-rgb))', opacity: 0.5 }}>
         <span>30 days ago</span>
         <span>Today</span>
       </div>

@@ -18,20 +18,17 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
     setDetail(d)
     setLoading(false)
 
-    if (settings?._hasApiKey) {
-      const cache = await window.devpilot.getCache()
-      const cached = cache.whereLeftOff?.[project.name]
-      const lastCommitHash = d.commits[0]?.hash
-      if (cached && cached.lastCommit === lastCommitHash) {
-        setSummary(cached.text)
-      } else {
-        generateSummary(d)
-      }
+    const cache = await window.devpilot.getCache()
+    const cached = cache.whereLeftOff?.[project.name]
+    const lastCommitHash = d.commits[0]?.hash
+    if (cached && cached.lastCommit === lastCommitHash) {
+      setSummary(cached.text)
+    } else {
+      generateSummary(d)
     }
   }
 
   async function generateSummary(d) {
-    if (!settings?._hasApiKey) return
     setSummaryLoading(true)
     try {
       const result = await window.devpilot.aiWhereLeftOff(project.name, d || detail)
@@ -58,7 +55,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
 
   return (
     <div className="max-w-[900px]">
-      <button onClick={onBack} className="text-xs text-muted hover:text-[var(--text)] mb-4 flex items-center gap-1">
+      <button onClick={onBack} className="text-xs text-muted hover:text-[rgb(var(--text-rgb))] mb-4 flex items-center gap-1">
         ← Back to projects
       </button>
 
@@ -70,9 +67,9 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
           project.status === 'archived' ? 'text-muted' :
           'text-stale'
         }`} style={{
-          background: project.status === 'active' ? 'rgba(var(--accent-rgb), 0.2)' :
+          background: project.status === 'active' ? 'rgb(var(--accent-rgb) / 0.2)' :
                       project.status === 'paused' ? 'rgba(239, 159, 39, 0.2)' :
-                      project.status === 'archived' ? 'var(--border)' :
+                      project.status === 'archived' ? 'var(--border-val)' :
                       'rgba(226, 75, 74, 0.2)'
         }}>
           {project.status}
@@ -81,8 +78,8 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
           {onToggleArchive && (
             <button
               onClick={() => onToggleArchive(project.name)}
-              className="text-xs px-3 py-1.5 rounded-md transition-colors text-muted hover:text-[var(--text)]"
-              style={{ border: '1px solid var(--border)' }}
+              className="text-xs px-3 py-1.5 rounded-md transition-colors text-muted hover:text-[rgb(var(--text-rgb))]"
+              style={{ border: '1px solid var(--border-val)' }}
             >
               {project.status === 'archived' ? 'Unarchive' : 'Archive'}
             </button>
@@ -90,7 +87,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
           <button
             onClick={() => window.devpilot.openInVSCode(project.path)}
             className="text-xs px-3 py-1.5 rounded-md text-accent hover:opacity-80 transition-colors"
-            style={{ background: 'rgba(var(--accent-rgb), 0.2)' }}
+            style={{ background: 'rgb(var(--accent-rgb) / 0.2)' }}
           >
             Open in VS Code
           </button>
@@ -98,17 +95,17 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
       </div>
 
       {/* Where I Left Off */}
-      <div className="bg-bg-briefing rounded-lg p-4 mb-6" style={{ border: '1px solid rgba(var(--accent-rgb), 0.2)' }}>
+      <div className="bg-bg-briefing rounded-lg p-4 mb-6" style={{ border: '1px solid rgb(var(--accent-rgb) / 0.2)' }}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-medium text-accent flex items-center gap-2">
             <span>●</span> Where I Left Off
           </h3>
-          {detail && settings?._hasApiKey && (
+          {detail && (
             <button
               onClick={() => generateSummary()}
               disabled={summaryLoading}
-              className="text-xs text-muted px-2 py-1 rounded transition-colors disabled:opacity-50 hover:text-[var(--text)]"
-              style={{ border: '1px solid var(--border)' }}
+              className="text-xs text-muted px-2 py-1 rounded transition-colors disabled:opacity-50 hover:text-[rgb(var(--text-rgb))]"
+              style={{ border: '1px solid var(--border-val)' }}
             >
               {summaryLoading ? 'Generating...' : 'Refresh'}
             </button>
@@ -116,8 +113,8 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
         </div>
         {summaryLoading && (
           <div className="space-y-2">
-            <div className="h-3 rounded w-full animate-pulse" style={{ background: 'var(--border)' }} />
-            <div className="h-3 rounded w-3/4 animate-pulse" style={{ background: 'var(--border)' }} />
+            <div className="h-3 rounded w-full animate-pulse" style={{ background: 'var(--border-val)' }} />
+            <div className="h-3 rounded w-3/4 animate-pulse" style={{ background: 'var(--border-val)' }} />
           </div>
         )}
         {!summaryLoading && summary && (
@@ -125,7 +122,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
         )}
         {!summaryLoading && !summary && (
           <p className="text-sm text-muted">
-            {settings?._hasApiKey ? 'Loading...' : 'Add your Claude API key in Settings to see AI summaries.'}
+            Loading...
           </p>
         )}
       </div>
@@ -133,7 +130,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-8 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+            <div key={i} className="h-8 rounded animate-pulse" style={{ background: 'var(--border-val)' }} />
           ))}
         </div>
       ) : (
@@ -168,7 +165,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
                     onClick={() => window.devpilot.openInVSCode(t.file, t.line)}
                     className="flex gap-2 text-sm py-1 w-full text-left hover:bg-bg-hover rounded px-1 -mx-1"
                   >
-                    <span className="text-xs px-1.5 py-0.5 rounded text-muted shrink-0" style={{ background: 'var(--border)' }}>{t.type}</span>
+                    <span className="text-xs px-1.5 py-0.5 rounded text-muted shrink-0" style={{ background: 'var(--border-val)' }}>{t.type}</span>
                     <span className="truncate" style={{ opacity: 0.7 }}>{t.text}</span>
                     <span className="text-muted/50 text-xs ml-auto shrink-0">{t.relativePath}:{t.line}</span>
                   </button>
@@ -190,7 +187,7 @@ export default function ProjectDetail({ project, onBack, settings, onToggleArchi
 
 function Section({ title, children }) {
   return (
-    <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border)' }}>
+    <div className="bg-bg-card rounded-lg p-4" style={{ border: '1px solid var(--border-val)' }}>
       <h3 className="text-sm font-medium text-muted mb-3">{title}</h3>
       {children}
     </div>

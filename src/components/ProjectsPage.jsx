@@ -20,7 +20,7 @@ export default function ProjectsPage({ projects, loading, onOpenProject, onToggl
               key={f}
               onClick={() => setFilter(f)}
               className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
-                filter === f ? 'bg-white/[0.1] text-white' : 'text-muted hover:text-white'
+                filter === f ? 'bg-bg-hover' : 'text-muted hover:bg-bg-hover'
               }`}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}

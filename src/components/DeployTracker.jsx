@@ -21,20 +21,20 @@ export default function DeployTracker() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
       <MetricCard label="Railway" value={railwayUp === null ? '...' : railwayUp ? 'Online' : 'Down'}
-        color={railwayUp === null ? 'var(--text-muted)' : railwayUp ? 'var(--accent)' : '#E24B4A'} />
+        color={railwayUp === null ? 'rgb(var(--text-muted-rgb))' : railwayUp ? 'rgb(var(--accent-rgb))' : '#E24B4A'} />
       <MetricCard label="Extensions" value="5" />
-      <MetricCard label="MRR" value="—" color="var(--text-muted)" />
-      <MetricCard label="API Calls" value="0" color="var(--text-muted)" sub="this session" />
+      <MetricCard label="MRR" value="—" color="rgb(var(--text-muted-rgb))" />
+      <MetricCard label="API Calls" value="0" color="rgb(var(--text-muted-rgb))" sub="this session" />
     </div>
   )
 }
 
 function MetricCard({ label, value, color, sub }) {
   return (
-    <div className="bg-bg-card rounded-lg p-3" style={{ border: '1px solid var(--border)' }}>
+    <div className="bg-bg-card rounded-lg p-3" style={{ border: '1px solid var(--border-val)' }}>
       <p className="text-xs text-muted mb-1">{label}</p>
-      <p className="text-lg font-semibold" style={{ color: color || 'var(--text)' }}>{value}</p>
-      {sub && <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>{sub}</p>}
+      <p className="text-lg font-semibold" style={{ color: color || 'rgb(var(--text-rgb))' }}>{value}</p>
+      {sub && <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-muted-rgb))', opacity: 0.5 }}>{sub}</p>}
     </div>
   )
 }

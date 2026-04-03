@@ -20,7 +20,7 @@ export default function QuickOpen({ projects, onSelect, onClose }) {
         <input ref={inputRef} type="text" value={query} onChange={e => setQuery(e.target.value)}
           placeholder="Search projects..."
           className="w-full px-4 py-3 bg-transparent text-sm focus:outline-none"
-          style={{ color: 'var(--text)', borderBottom: '1px solid var(--border)' }} />
+          style={{ color: 'rgb(var(--text-rgb))', borderBottom: '1px solid var(--border-val)' }} />
         <div className="max-h-[300px] overflow-y-auto">
           {filtered.map(p => (
             <button key={p.name} onClick={() => onSelect(p)}

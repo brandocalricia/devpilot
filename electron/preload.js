@@ -7,10 +7,9 @@ contextBridge.exposeInMainWorld('devpilot', {
   getProjectDetail: (repoPath) => ipcRenderer.invoke('get-project-detail', repoPath),
   openInVSCode: (filePath, line) => ipcRenderer.invoke('open-in-vscode', filePath, line),
 
-  // Settings (API key is encrypted at rest, never exposed to renderer)
+  // Settings (license key encrypted at rest)
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
-  saveApiKey: (key) => ipcRenderer.invoke('save-api-key', key),
   saveLicenseKey: (key) => ipcRenderer.invoke('save-license-key', key),
   getCache: () => ipcRenderer.invoke('get-cache'),
   saveCache: (data) => ipcRenderer.invoke('save-cache', data),
@@ -22,7 +21,7 @@ contextBridge.exposeInMainWorld('devpilot', {
   validateLicense: (key) => ipcRenderer.invoke('validate-license', key),
   deactivateLicense: (key) => ipcRenderer.invoke('deactivate-license', key),
 
-  // AI (rate-limited, key stays in main process)
+  // AI (proxied through server, rate-limited server-side)
   aiBriefing: (projects) => ipcRenderer.invoke('ai-briefing', projects),
   aiWhereLeftOff: (projectName, detail) => ipcRenderer.invoke('ai-where-left-off', projectName, detail),
   aiChat: (question, context, history) => ipcRenderer.invoke('ai-chat', question, context, history),

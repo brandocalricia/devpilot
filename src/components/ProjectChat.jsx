@@ -23,14 +23,6 @@ export default function ProjectChat({ projects, settings }) {
 
   async function send() {
     if (!input.trim() || loading) return
-    if (!settings?._hasApiKey) {
-      setMessages(prev => [...prev,
-        { role: 'user', content: input },
-        { role: 'assistant', content: 'Add your Claude API key in Settings to enable AI chat.' },
-      ])
-      setInput('')
-      return
-    }
 
     const question = input
     setInput('')
@@ -78,13 +70,13 @@ export default function ProjectChat({ projects, settings }) {
           value={selectedProject}
           onChange={e => setSelectedProject(e.target.value)}
           className="text-xs bg-bg-card rounded-md px-2 py-1.5"
-          style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+          style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
         >
           <option value="all">All projects</option>
           {projects.map(p => <option key={p.name} value={p.name}>{p.name}</option>)}
         </select>
         {messages.length > 0 && (
-          <button onClick={clearChat} className="ml-auto text-xs text-muted hover:text-[var(--text)] px-2 py-1 rounded transition-colors" style={{ border: '1px solid var(--border)' }}>
+          <button onClick={clearChat} className="ml-auto text-xs text-muted hover:text-[rgb(var(--text-rgb))] px-2 py-1 rounded transition-colors" style={{ border: '1px solid var(--border-val)' }}>
             Clear
           </button>
         )}
@@ -92,7 +84,7 @@ export default function ProjectChat({ projects, settings }) {
 
       <div className="flex-1 overflow-y-auto space-y-3 mb-4">
         {messages.length === 0 && (
-          <div className="text-center mt-20" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+          <div className="text-center mt-20" style={{ color: 'rgb(var(--text-muted-rgb))', opacity: 0.5 }}>
             <p className="text-lg mb-2">Ask anything about your projects</p>
             <div className="space-y-1 text-xs">
               <p>"What should I prioritize today?"</p>
@@ -103,10 +95,10 @@ export default function ProjectChat({ projects, settings }) {
         )}
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${m.role === 'user' ? 'text-white' : ''}`}
+            <div className="max-w-[80%] px-3 py-2 rounded-lg text-sm"
               style={m.role === 'user'
-                ? { background: 'rgba(var(--accent-rgb), 0.2)' }
-                : { background: 'var(--bg-card)', border: '1px solid var(--border)' }
+                ? { background: 'rgb(var(--accent-rgb) / 0.2)' }
+                : { background: 'rgb(var(--bg-card-rgb))', border: '1px solid var(--border-val)' }
               }>
               {m.role === 'assistant' ? <Markdown>{m.content}</Markdown> : <span>{m.content}</span>}
             </div>
@@ -114,11 +106,11 @@ export default function ProjectChat({ projects, settings }) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-bg-card rounded-lg px-4 py-3" style={{ border: '1px solid var(--border)' }}>
+            <div className="bg-bg-card rounded-lg px-4 py-3" style={{ border: '1px solid var(--border-val)' }}>
               <div className="flex gap-1">
-                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--accent)', opacity: 0.5, animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--accent)', opacity: 0.5, animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'var(--accent)', opacity: 0.5, animationDelay: '300ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgb(var(--accent-rgb))', opacity: 0.5, animationDelay: '0ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgb(var(--accent-rgb))', opacity: 0.5, animationDelay: '150ms' }} />
+                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgb(var(--accent-rgb))', opacity: 0.5, animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -134,14 +126,14 @@ export default function ProjectChat({ projects, settings }) {
           onKeyDown={e => { if (e.key === 'Enter') send() }}
           placeholder="Ask about your projects..."
           className="flex-1 bg-bg-card rounded-lg px-3 py-2 text-sm focus:outline-none"
-          style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+          style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
           disabled={loading}
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
           className="px-4 py-2 text-accent rounded-lg text-sm hover:opacity-80 transition-colors disabled:opacity-50"
-          style={{ background: 'rgba(var(--accent-rgb), 0.2)' }}
+          style={{ background: 'rgb(var(--accent-rgb) / 0.2)' }}
         >
           Send
         </button>

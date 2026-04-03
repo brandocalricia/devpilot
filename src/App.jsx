@@ -120,7 +120,7 @@ export default function App() {
 
   return (
     <ThemeProvider settings={settings} onSaveSettings={updateSettings}>
-      <div className="flex h-screen bg-bg" style={{ color: 'var(--text)' }}>
+      <div className="flex h-screen bg-bg" style={{ color: 'rgb(var(--text-rgb))' }}>
         <Sidebar active={page} onNavigate={(p) => { setPage(p); setSelectedProject(null) }} />
         <div className="flex-1 flex flex-col overflow-hidden">
           <UpdateBanner />

@@ -5,10 +5,10 @@ import AiBriefing from './AiBriefing'
 
 function SkeletonCard() {
   return (
-    <div className="bg-bg-card rounded-lg p-4 animate-pulse" style={{ border: '1px solid var(--border)' }}>
-      <div className="h-4 rounded w-2/3 mb-3" style={{ background: 'var(--border)' }} />
-      <div className="h-3 rounded w-1/2 mb-2" style={{ background: 'var(--border)' }} />
-      <div className="h-3 rounded w-3/4" style={{ background: 'var(--border)' }} />
+    <div className="bg-bg-card rounded-lg p-4 animate-pulse" style={{ border: '1px solid var(--border-val)' }}>
+      <div className="h-4 rounded w-2/3 mb-3" style={{ background: 'var(--border-val)' }} />
+      <div className="h-3 rounded w-1/2 mb-2" style={{ background: 'var(--border-val)' }} />
+      <div className="h-3 rounded w-3/4" style={{ background: 'var(--border-val)' }} />
     </div>
   )
 }
@@ -21,8 +21,8 @@ export default function Dashboard({ projects, activeProjects, heatmapData, loadi
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Dashboard</h2>
         <button onClick={onRefresh}
-          className="text-xs text-muted hover:text-[var(--text)] px-3 py-1.5 rounded-md transition-colors"
-          style={{ border: '1px solid var(--border)' }}>
+          className="text-xs text-muted hover:text-[rgb(var(--text-rgb))] px-3 py-1.5 rounded-md transition-colors"
+          style={{ border: '1px solid var(--border-val)' }}>
           Refresh
         </button>
       </div>
@@ -54,7 +54,7 @@ export default function Dashboard({ projects, activeProjects, heatmapData, loadi
       {archivedProjects.length > 0 && (
         <>
           <div className="mt-8 mb-4">
-            <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>
+            <h3 className="text-sm font-medium mb-3" style={{ color: 'rgb(var(--text-muted-rgb))', opacity: 0.5 }}>
               Archived ({archivedProjects.length})
             </h3>
           </div>

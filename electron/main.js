@@ -1,16 +1,28 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const https = require('https')
+const http = require('http')
+const crypto = require('crypto')
+const os = require('os')
 const { scanProjects, scanTodos, getProjectDetail } = require('./scanner')
-const { generateBriefing, generateWhereILeftOff, chatAboutProject } = require('./ai')
 const { validateLicense, deactivateLicense } = require('./license')
 const { setupAutoUpdater } = require('./updater')
 const { encrypt, decrypt } = require('./crypto')
-const { checkAndIncrement, getStatus } = require('./ratelimit')
 
 let mainWindow
 const APP_VERSION = require('../package.json').version
-const SENSITIVE_KEYS = ['apiKey', 'licenseKey']
+const SENSITIVE_KEYS = ['licenseKey']
+
+// --- Server config ---
+const API_BASE = 'https://devpilot-proxy-production.up.railway.app' // TODO: update after deploy
+const APP_SECRET = 'dplt_s3cr3t_k3y_2024_pr0d' // TODO: generate a real secret and match server env
+
+// --- Device fingerprint ---
+function getDeviceId() {
+  const raw = `devpilot-${os.hostname()}-${os.userInfo().username}-${os.cpus()[0]?.model || 'cpu'}-${os.platform()}-${os.arch()}`
+  return crypto.createHash('sha256').update(raw).digest('hex')
+}
 
 // --- Settings with encryption ---
 
@@ -35,11 +47,8 @@ function writeSettings(settings) {
   const toStore = { ...settings }
   for (const key of SENSITIVE_KEYS) {
     if (toStore[key] && !toStore[key].includes(':')) {
-      // Only encrypt if not already encrypted (no colons = plaintext)
-      // Actually check more carefully: encrypted format is hex:hex:hex
       toStore[key] = encrypt(toStore[key])
     } else if (toStore[key]) {
-      // Re-encrypt to be safe
       const plain = decrypt(toStore[key])
       toStore[key] = encrypt(plain)
     }
@@ -47,19 +56,14 @@ function writeSettings(settings) {
   fs.writeFileSync(getSettingsPath(), JSON.stringify(toStore, null, 2))
 }
 
-// Migrate existing plaintext keys on first run
 function migrateSettings() {
   try {
     const raw = fs.readFileSync(getSettingsPath(), 'utf-8')
     const settings = JSON.parse(raw)
-    let needsMigration = false
-    for (const key of SENSITIVE_KEYS) {
-      if (settings[key] && settings[key].startsWith('sk-')) {
-        needsMigration = true
-      }
-    }
-    if (needsMigration) {
-      writeSettings(readSettings())
+    // Remove old apiKey field if present
+    if (settings.apiKey) {
+      delete settings.apiKey
+      fs.writeFileSync(getSettingsPath(), JSON.stringify(settings, null, 2))
     }
   } catch {}
 }
@@ -119,6 +123,55 @@ app.whenReady().then(() => {
 })
 app.on('window-all-closed', () => app.quit())
 
+// --- Proxy helper ---
+
+function proxyRequest(method, urlPath, body, licenseKey) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(urlPath, API_BASE)
+    const isHttps = url.protocol === 'https:'
+    const mod = isHttps ? https : http
+    const payload = body ? JSON.stringify(body) : null
+
+    const options = {
+      hostname: url.hostname,
+      port: url.port || (isHttps ? 443 : 80),
+      path: url.pathname,
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-app-secret': APP_SECRET,
+        'x-device-id': getDeviceId(),
+      },
+      timeout: 30000,
+    }
+
+    if (licenseKey) options.headers['x-license-key'] = licenseKey
+    if (payload) options.headers['Content-Length'] = Buffer.byteLength(payload)
+
+    const req = mod.request(options, (res) => {
+      let data = ''
+      res.on('data', (chunk) => data += chunk)
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data))
+        } catch {
+          reject(new Error('Invalid response from server'))
+        }
+      })
+    })
+
+    req.on('error', (e) => reject(new Error(`Server unreachable: ${e.message}`)))
+    req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')) })
+    if (payload) req.write(payload)
+    req.end()
+  })
+}
+
+function getLicenseKey() {
+  const settings = readSettings() || {}
+  return settings.licenseKey || ''
+}
+
 // --- IPC: App info ---
 ipcMain.handle('get-app-version', () => APP_VERSION)
 
@@ -136,42 +189,29 @@ ipcMain.handle('open-in-vscode', async (_, filePath, line) => {
 })
 
 // --- IPC: Settings (encrypted) ---
-// Returns settings with sensitive fields REDACTED for the renderer
 ipcMain.handle('get-settings', async () => {
   const settings = readSettings()
   if (!settings) return null
   return {
     ...settings,
-    apiKey: settings.apiKey ? '••••••••' : '',
-    _hasApiKey: !!settings.apiKey,
+    licenseKey: settings.licenseKey ? '••••••••' : '',
     _hasLicenseKey: !!settings.licenseKey,
   }
 })
 
-// Save settings — renderer sends plaintext, we encrypt before storing
 ipcMain.handle('save-settings', async (_, settings) => {
-  // If apiKey is the redacted placeholder, preserve the existing one
   const existing = readSettings() || {}
   const toSave = { ...settings }
-  if (toSave.apiKey === '••••••••') {
-    toSave.apiKey = existing.apiKey || ''
-  }
   if (toSave.licenseKey === '••••••••') {
     toSave.licenseKey = existing.licenseKey || ''
   }
+  // Never store apiKey anymore
+  delete toSave.apiKey
+  delete toSave._hasApiKey
   writeSettings(toSave)
   return true
 })
 
-// Dedicated handler for updating just the API key
-ipcMain.handle('save-api-key', async (_, key) => {
-  const settings = readSettings() || {}
-  settings.apiKey = key
-  writeSettings(settings)
-  return true
-})
-
-// Dedicated handler for updating just the license key
 ipcMain.handle('save-license-key', async (_, key) => {
   const settings = readSettings() || {}
   settings.licenseKey = key
@@ -181,8 +221,6 @@ ipcMain.handle('save-license-key', async (_, key) => {
 
 // --- IPC: Health check ---
 ipcMain.handle('check-health', async (_, url) => {
-  const https = require('https')
-  const http = require('http')
   return new Promise((resolve) => {
     const mod = url.startsWith('https') ? https : http
     const req = mod.get(url, { timeout: 5000 }, (res) => {
@@ -214,64 +252,37 @@ ipcMain.handle('deactivate-license', async (_, key) => {
   return true
 })
 
-// --- IPC: Rate-limited AI ---
-// All AI calls go through main process using the STORED api key
-// The renderer NEVER sees the actual API key
-
-function isPro() {
-  const settings = readSettings() || {}
-  return !!settings.licenseKey
-}
+// --- IPC: AI (proxied through server) ---
 
 ipcMain.handle('ai-usage-status', async () => {
-  return getStatus(app.getPath('userData'), isPro())
+  try {
+    return await proxyRequest('GET', '/api/ai/usage', null, getLicenseKey())
+  } catch {
+    return { used: 0, limit: 3, remaining: 3 }
+  }
 })
 
 ipcMain.handle('ai-briefing', async (_, projects) => {
-  const rl = checkAndIncrement(app.getPath('userData'), isPro())
-  if (!rl.allowed) {
-    const plan = isPro() ? 'Pro' : 'Free'
-    return { error: `Daily AI limit reached (${rl.limit}/${plan}). ${isPro() ? 'Try again tomorrow.' : 'Upgrade to Pro for 25/day.'}`, remaining: 0 }
-  }
-  const settings = readSettings()
-  if (!settings?.apiKey) return { error: 'No API key configured. Add one in Settings.', remaining: rl.remaining }
   try {
-    const text = await generateBriefing(settings.apiKey, projects)
-    return { text, remaining: rl.remaining }
+    return await proxyRequest('POST', '/api/ai/briefing', { projects }, getLicenseKey())
   } catch (e) {
-    return { error: e.message || 'AI call failed', remaining: rl.remaining }
+    return { error: e.message || 'Failed to reach AI server.' }
   }
 })
 
 ipcMain.handle('ai-where-left-off', async (_, projectName, detail) => {
-  const rl = checkAndIncrement(app.getPath('userData'), isPro())
-  if (!rl.allowed) {
-    const plan = isPro() ? 'Pro' : 'Free'
-    return { error: `Daily AI limit reached (${rl.limit}/${plan}). ${isPro() ? 'Try again tomorrow.' : 'Upgrade to Pro for 25/day.'}`, remaining: 0 }
-  }
-  const settings = readSettings()
-  if (!settings?.apiKey) return { error: 'No API key configured.', remaining: rl.remaining }
   try {
-    const text = await generateWhereILeftOff(settings.apiKey, projectName, detail)
-    return { text, remaining: rl.remaining }
+    return await proxyRequest('POST', '/api/ai/where-left-off', { projectName, detail }, getLicenseKey())
   } catch (e) {
-    return { error: e.message || 'AI call failed', remaining: rl.remaining }
+    return { error: e.message || 'Failed to reach AI server.' }
   }
 })
 
 ipcMain.handle('ai-chat', async (_, question, context, history) => {
-  const rl = checkAndIncrement(app.getPath('userData'), isPro())
-  if (!rl.allowed) {
-    const plan = isPro() ? 'Pro' : 'Free'
-    return { error: `Daily AI limit reached (${rl.limit}/${plan}). ${isPro() ? 'Try again tomorrow.' : 'Upgrade to Pro for 25/day.'}`, remaining: 0 }
-  }
-  const settings = readSettings()
-  if (!settings?.apiKey) return { error: 'No API key configured.', remaining: rl.remaining }
   try {
-    const text = await chatAboutProject(settings.apiKey, question, context, history)
-    return { text, remaining: rl.remaining }
+    return await proxyRequest('POST', '/api/ai/chat', { question, context, history }, getLicenseKey())
   } catch (e) {
-    return { error: e.message || 'AI call failed', remaining: rl.remaining }
+    return { error: e.message || 'Failed to reach AI server.' }
   }
 })
 

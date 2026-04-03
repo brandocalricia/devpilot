@@ -30,12 +30,12 @@ export default function TodoList({ settings }) {
       <h2 className="text-xl font-semibold mb-6">TODOs</h2>
       <div className="flex gap-4 mb-4">
         <select value={filterProject} onChange={e => setFilterProject(e.target.value)}
-          className="text-xs bg-bg-card rounded-md px-2 py-1.5" style={{ border: '1px solid var(--border)', color: 'var(--text)' }}>
+          className="text-xs bg-bg-card rounded-md px-2 py-1.5" style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}>
           <option value="all">All projects</option>
           {projects.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
         <select value={filterType} onChange={e => setFilterType(e.target.value)}
-          className="text-xs bg-bg-card rounded-md px-2 py-1.5" style={{ border: '1px solid var(--border)', color: 'var(--text)' }}>
+          className="text-xs bg-bg-card rounded-md px-2 py-1.5" style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}>
           <option value="all">All types</option>
           {types.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
@@ -44,7 +44,7 @@ export default function TodoList({ settings }) {
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-10 rounded animate-pulse" style={{ background: 'var(--border)' }} />
+            <div key={i} className="h-10 rounded animate-pulse" style={{ background: 'var(--border-val)' }} />
           ))}
         </div>
       ) : (
@@ -56,7 +56,7 @@ export default function TodoList({ settings }) {
                 t.type === 'FIXME' ? 'text-stale' : t.type === 'HACK' ? 'text-paused' : 'text-muted'
               }`} style={{
                 background: t.type === 'FIXME' ? 'rgba(226,75,74,0.2)' :
-                             t.type === 'HACK' ? 'rgba(239,159,39,0.2)' : 'var(--border)'
+                             t.type === 'HACK' ? 'rgba(239,159,39,0.2)' : 'var(--border-val)'
               }}>{t.type}</span>
               <span className="text-sm truncate flex-1" style={{ opacity: 0.8 }}>{t.text}</span>
               <span className="text-xs text-accent shrink-0" style={{ opacity: 0.6 }}>{t.project}</span>

@@ -3,12 +3,11 @@ import { useState } from 'react'
 export default function Onboarding({ onComplete }) {
   const [step, setStep] = useState(0)
   const [projectsPath, setProjectsPath] = useState('C:\\Users\\bzcni\\OneDrive\\Desktop\\vs code projects')
-  const [apiKey, setApiKey] = useState('')
   const [licenseKey, setLicenseKey] = useState('')
   const [validating, setValidating] = useState(false)
   const [licenseError, setLicenseError] = useState(null)
 
-  async function validateLicense() {
+  async function validateAndContinue() {
     if (!licenseKey.trim()) {
       setStep(3)
       return
@@ -29,13 +28,8 @@ export default function Onboarding({ onComplete }) {
   }
 
   async function finish() {
-    // Save API key securely through dedicated handler
-    if (apiKey.trim()) {
-      await window.devpilot.saveApiKey(apiKey.trim())
-    }
     const settings = {
       projectsPath,
-      apiKey: '', // Never stored in settings — handled by saveApiKey
       licenseKey: '', // Handled by validateLicense
       theme: 'dark',
       accentColor: '#5DCAA5',
@@ -47,18 +41,17 @@ export default function Onboarding({ onComplete }) {
       onboardingComplete: true,
     }
     await window.devpilot.saveSettings(settings)
-    // Re-read settings to get _hasApiKey flag
     const final = await window.devpilot.getSettings()
     onComplete(final || settings)
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'var(--bg)' }}>
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgb(var(--bg-rgb))' }}>
       <div className="w-[480px]">
         <div className="flex gap-1.5 mb-8 justify-center">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className={`h-1 rounded-full w-12 transition-colors ${i <= step ? 'bg-accent' : ''}`}
-              style={i > step ? { background: 'var(--border)' } : undefined} />
+              style={i > step ? { background: 'var(--border-val)' } : undefined} />
           ))}
         </div>
 
@@ -82,10 +75,10 @@ export default function Onboarding({ onComplete }) {
             <p className="text-sm text-muted mb-6">Point DevPilot to the folder containing your git repos.</p>
             <input type="text" value={projectsPath} onChange={e => setProjectsPath(e.target.value)}
               className="w-full bg-bg-card rounded-lg px-3 py-2.5 text-sm focus:outline-none mb-6"
-              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+              style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
               placeholder="C:\Users\you\projects" />
             <div className="flex justify-between">
-              <button onClick={() => setStep(0)} className="text-sm text-muted hover:text-[var(--text)] transition-colors">Back</button>
+              <button onClick={() => setStep(0)} className="text-sm text-muted hover:text-[rgb(var(--text-rgb))] transition-colors">Back</button>
               <button onClick={() => setStep(2)} disabled={!projectsPath.trim()}
                 className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50">
                 Next
@@ -96,26 +89,20 @@ export default function Onboarding({ onComplete }) {
 
         {step === 2 && (
           <div>
-            <h2 className="text-lg font-semibold mb-1">Activate DevPilot</h2>
-            <p className="text-sm text-muted mb-6">Enter your license key to unlock Pro. You can skip and use the free tier (3 AI calls/day).</p>
+            <h2 className="text-lg font-semibold mb-1">Unlock Pro</h2>
+            <p className="text-sm text-muted mb-6">Enter your license key for 25 AI calls/day and priority features. Skip to use the free tier (3 AI calls/day).</p>
             <label className="block text-xs text-muted mb-1.5">License Key</label>
             <input type="text" value={licenseKey} onChange={e => setLicenseKey(e.target.value)}
               className="w-full bg-bg-card rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none mb-1"
-              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
+              style={{ border: '1px solid var(--border-val)', color: 'rgb(var(--text-rgb))' }}
               placeholder="DPLT-XXXX-XXXX-XXXX" />
             {licenseError && <p className="text-xs text-stale mb-3">{licenseError}</p>}
-            <p className="text-xs text-muted/50 mb-6">Free: 3 AI calls/day. Pro: 25/day + priority features.</p>
-            <label className="block text-xs text-muted mb-1.5 mt-4">Claude API Key <span className="text-muted/50">(powers AI features)</span></label>
-            <input type="password" value={apiKey} onChange={e => setApiKey(e.target.value)}
-              className="w-full bg-bg-card rounded-lg px-3 py-2.5 text-sm focus:outline-none mb-1"
-              style={{ border: '1px solid var(--border)', color: 'var(--text)' }}
-              placeholder="sk-ant-..." />
-            <p className="text-xs text-muted/50 mb-6">Encrypted locally. Never sent anywhere except Anthropic's API.</p>
+            <p className="text-xs text-muted/50 mb-6">AI features are included — no API key needed.</p>
             <div className="flex justify-between">
-              <button onClick={() => setStep(1)} className="text-sm text-muted hover:text-[var(--text)] transition-colors">Back</button>
+              <button onClick={() => setStep(1)} className="text-sm text-muted hover:text-[rgb(var(--text-rgb))] transition-colors">Back</button>
               <div className="flex gap-3">
-                <button onClick={() => setStep(3)} className="text-sm text-muted hover:text-[var(--text)] transition-colors">Skip</button>
-                <button onClick={validateLicense} disabled={validating}
+                <button onClick={() => setStep(3)} className="text-sm text-muted hover:text-[rgb(var(--text-rgb))] transition-colors">Skip</button>
+                <button onClick={validateAndContinue} disabled={validating}
                   className="px-5 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50">
                   {validating ? 'Validating...' : 'Activate'}
                 </button>
